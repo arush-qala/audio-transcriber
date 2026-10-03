@@ -2,6 +2,21 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Model upgrade check (every session)
+
+Every time you read this file or touch audio-transcriber files, check Deepgram
+for newer speech-to-text models before doing other work:
+
+1. Fetch `https://developers.deepgram.com/docs/models-languages-overview`
+   and `https://developers.deepgram.com/changelog`.
+2. Note the current defaults in `transcribe.py` (`MODEL`, `LANGUAGE`) and the
+   `index.html` model dropdown.
+3. If a newer general-purpose model exists (e.g. Nova-4, Nova-5, new Flux
+   generation) that fits file transcription + diarization, tell the user what
+   it is, how accuracy, capability, and cost compare, and the exact param
+   change needed.
+4. Suggest only. Never change model defaults without explicit approval.
+
 ## What this is
 
 A thin client over Deepgram's hosted speech-to-text API (`nova-3` multilingual model) with speaker
@@ -25,8 +40,9 @@ python serve.py 3000                   # custom port
 python serve.py --no-browser           # don't auto-open
 ```
 
-There are no tests, linters, or build step. This is not a git repository (a `.gitignore`
-exists but nothing is initialized).
+There are no tests, linters, or build step. This is a git repository pushed to
+GitHub as a public repo (see README.md); `.env` is git-ignored and must never
+be committed.
 
 ## Architecture
 
