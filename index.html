@@ -455,6 +455,8 @@
       <label for="modelSelect">Model</label>
       <select id="modelSelect" onchange="onModelChange()">
         <option value="nova3-multi" selected>Nova-3 multilingual</option>
+        <option value="kn-hi-en">Kannada + Hindi + English</option>
+        <option value="kn">Kannada only</option>
         <option value="nova3-single">Nova-3 single language</option>
         <option value="nova2">Nova-2</option>
       </select>
@@ -585,6 +587,13 @@
       if (choice === 'nova3-single') {
         const lang = $('languageSelect').value || 'en';
         return `model=nova-3&diarize=true&smart_format=true&utterances=true&language=${encodeURIComponent(lang)}`;
+      }
+      if (choice === 'kn-hi-en') {
+        // multi mode, biased (not restricted) toward these three languages
+        return 'model=nova-3&diarize=true&smart_format=true&utterances=true&language=multi&language_hint=kn&language_hint=hi&language_hint=en';
+      }
+      if (choice === 'kn') {
+        return 'model=nova-3&diarize=true&smart_format=true&utterances=true&language=kn';
       }
       if (choice === 'nova2') {
         return 'model=nova-2&diarize=true&smart_format=true&utterances=true&language=en';

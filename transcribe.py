@@ -63,14 +63,16 @@ def format_timestamp(seconds: float) -> str:
     return f"{m:02d}:{s:02d}"
 
 
-def transcribe(audio_path: str, api_key: str, model: str = MODEL, language: str = LANGUAGE) -> dict:
+def transcribe(audio_path: str, api_key: str, model: str = MODEL, language: str = LANGUAGE,
+               hints=None) -> dict:
     """Send audio file to Deepgram and return the full API response."""
     file_size_mb = os.path.getsize(audio_path) / (1024 * 1024)
     ext = os.path.splitext(audio_path)[1].lower()
     content_type = MIME_TYPES.get(ext, "audio/mpeg")
 
+    hint_note = f", hints={','.join(hints)}" if hints else ""
     print(f"File: {os.path.basename(audio_path)} ({file_size_mb:.1f} MB)")
-    print(f"Uploading and transcribing with {model} (language={language}) + diarization...")
+    print(f"Uploading and transcribing with {model} (language={language}{hint_note}) + diarization...")
 
     headers = {
         "Authorization": f"Token {api_key}",
@@ -83,6 +85,8 @@ def transcribe(audio_path: str, api_key: str, model: str = MODEL, language: str 
         "utterances": "true",
         "language": language,
     }
+    if hints:
+        params["language_hint"] = hints  # requests sends a list as repeated keys
 
     with open(audio_path, "rb") as f:
         audio_data = f.read()
@@ -132,9 +136,14 @@ def main():
     parser.add_argument("--model", default=MODEL,
                         help="Deepgram model (default: nova-3). e.g. nova-3, nova-2")
     parser.add_argument("--language", default=LANGUAGE,
-                        help="Language code or multi (default: multi). e.g. en, es, hi")
+                        help="Language code or multi (default: multi). e.g. en, es, hi, kn")
+    parser.add_argument("--hint", type=lambda s: [c.strip() for c in s.split(",") if c.strip()],
+                        help="Comma-separated languages to bias multi mode toward, e.g. kn,hi,en")
 
     args = parser.parse_args()
+
+    if args.hint and args.language != "multi":
+        parser.error("--hint only works with --language multi (Deepgram ignores it otherwise)")
 
     if not os.path.isfile(args.file):
         print(f"Error: File not found: {args.file}", file=sys.stderr)
@@ -143,7 +152,7 @@ def main():
     api_key = get_api_key()
 
     start = time.time()
-    result = transcribe(args.file, api_key, model=args.model, language=args.language)
+    result = transcribe(args.file, api_key, model=args.model, language=args.language, hints=args.hint)
     elapsed = time.time() - start
 
     duration = result.get("metadata", {}).get("duration", 0)

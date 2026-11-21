@@ -69,13 +69,19 @@ sending raw audio bytes as the POST body with options passed as URL query params
 
 ### Where Deepgram options live
 
-- `transcribe.py` — defaults `MODEL = "nova-3"`, `LANGUAGE = "multi"`.
+- `transcribe.py`: defaults `MODEL = "nova-3"`, `LANGUAGE = "multi"`.
   Override per-run with `--model` / `--language`
-  (e.g. `--model nova-2 --language en`, `--model nova-3 --language hi`).
-- Web UI (`index.html`) — `Model` dropdown (default Nova-3 multilingual):
-  Nova-3 multi (`language=multi`), Nova-3 single (reveals a `Language`
+  (e.g. `--model nova-2 --language en`, `--model nova-3 --language kn`).
+  `--hint kn,hi,en` adds repeated `language_hint` params (multi only; the CLI
+  errors if `--language` is not `multi`).
+- Web UI (`index.html`): `Model` dropdown (default Nova-3 multilingual):
+  Nova-3 multi (`language=multi`), Kannada + Hindi + English
+  (`language=multi&language_hint=kn&language_hint=hi&language_hint=en`),
+  Kannada only (`language=kn`), Nova-3 single (reveals a `Language`
   dropdown, default `en`), Nova-2 (`language=en`). `buildParams()` assembles
   the query string; `serve.py` forwards it verbatim and needs no change.
+- `language_hint` biases detection, it does not restrict it. It is ignored
+  unless `language=multi`, and Nova-2 does not support it.
 
 ## Gotchas
 

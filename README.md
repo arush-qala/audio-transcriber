@@ -9,7 +9,7 @@ Built for interviews, meetings, lectures, and Voice Memos recordings where you n
 - Transcribes `mp3, wav, m4a, flac, ogg, webm, mp4, aac, wma`
 - Speaker diarization: `[Speaker 0] (00:02): Hello...`
 - Two ways to use it: command line script or browser UI with drag and drop
-- Model picker in the web UI: Nova-3 multilingual (default), Nova-3 single language with full language list, Nova-2
+- Model picker in the web UI: Nova-3 multilingual (default), Kannada + Hindi + English, Kannada only, Nova-3 single language with full language list, Nova-2
 - Smart formatting, utterances with timestamps, copy and download as `.txt`
 
 No local ML. Audio is sent to Deepgram's hosted API for transcription.
@@ -54,15 +54,19 @@ python transcribe.py recording.mp3 --print-only
 python transcribe.py recording.mp3 --model nova-3 --language multi
 python transcribe.py recording.mp3 --model nova-3 --language en
 python transcribe.py recording.mp3 --model nova-2 --language en
+python transcribe.py recording.mp3 --hint kn,hi,en    # Kannada + Hindi + English mix
+python transcribe.py recording.mp3 --language kn      # Kannada only
 ```
 
-Defaults are `--model nova-3 --language multi`.
+Defaults are `--model nova-3 --language multi`. `--hint` only works with `--language multi`.
 
 ## Models
 
 | Choice | Params | Best for |
 |---|---|---|
-| Nova-3 multilingual (default) | `model=nova-3&language=multi` | Mixed-language audio (en, es, fr, de, hi, ru, pt, ja, it, nl), also fine on English-only |
+| Nova-3 multilingual (default) | `model=nova-3&language=multi` | Mixed-language audio across 55 languages (including en, hi, kn), also fine on English-only |
+| Kannada + Hindi + English | `model=nova-3&language=multi&language_hint=kn&language_hint=hi&language_hint=en` | Conversations that switch between Kannada, Hindi and English. Hints bias detection toward these three but do not block other languages. Multilingual rate |
+| Kannada only | `model=nova-3&language=kn` | Audio that is all Kannada, monolingual rate |
 | Nova-3 single | `model=nova-3&language=<code>` | One known language, cheapest rate, 60+ codes supported |
 | Nova-2 | `model=nova-2&language=en` | Legacy, filler-word use cases |
 
